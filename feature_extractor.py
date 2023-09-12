@@ -22,6 +22,8 @@ class input_feature_map(object):
         self.ctx = device
 
     def get_feature_map(self, image):
+        if image is None:
+            return None
         image = mx.ndarray.array(image)
         image = self.transform(image)
         image = image.reshape(1, 3, 224, 224)

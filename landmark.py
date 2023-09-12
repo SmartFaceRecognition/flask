@@ -5,6 +5,8 @@ import numpy as np
 # Landmark predict function
 def landmark_predictor(detector, predictor, image):
     detections = detector(image)
+    if not detections:
+        return None
     landmarks = predictor(image, detections[0])  # 첫 번째 얼굴에 대해서만 랜드마크 추출
     landmarks_array = np.array([[point.x, point.y] for point in landmarks.parts()])
 
@@ -20,6 +22,8 @@ def eye_center(eye_landmark):
 # Face alignment function
 def face_alignment(detector, predictor, image):
     landmark = landmark_predictor(detector, predictor, image)
+    if landmark is None:
+        return None
     left_eye = eye_center(landmark[36:42])
     right_eye = eye_center(landmark[42:48])
     dY = right_eye[1] - left_eye[1]

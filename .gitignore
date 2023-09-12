@@ -1,6 +1,7 @@
 config.py
 *.pt
 *.dat
+*.png
 DB/feature_extractor/CGD.CUB200.C_concat_MG.ResNet50v.dim1536-0000.params
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,pycharm,flask
