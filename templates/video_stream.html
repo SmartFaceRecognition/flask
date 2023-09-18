@@ -1,10 +1,63 @@
 <!DOCTYPE html>
-<html>
+<html style="height: 100%;">
   <head>
-    <title>Video Streaming</title>
+    <meta name="viewport" content="width=device-width, minimum-scale=0.1">
+    <style>
+      /* 이미지 컨테이너 스타일 */
+      .image-container {
+        position: relative;
+        width: 640px; /* 이미지 너비 */
+        height: 480px; /* 이미지 높이 */
+        margin: 0 auto; /* 수평 가운데 정렬 */
+        background-color: hsl(0, 0%, 25%);
+      }
+
+      /* 원 스타일 */
+      .circle {
+        position: absolute;
+        top: 45%; /* 상단에서 중앙으로 이동 */
+        left: 50%; /* 좌측에서 중앙으로 이동 */
+        transform: translate(-50%, -50%); /* 수평 및 수직 중앙 정렬 */
+        width: 300px; /* 원 너비 */
+        height: 380px; /* 원 높이 */
+        border: 2px solid white; /* 테두리 스타일 및 색상 */
+        border-radius: 50%; /* 원 모양으로 만듦 */
+      }
+
+      /* 텍스트 스타일 */
+      .text {
+        position: absolute;
+        top: 90%; /* 상단에서 중앙 아래로 이동 */
+        left: 50%; /* 좌측에서 중앙으로 이동 */
+        transform: translateX(-50%); /* 수평 중앙 정렬 */
+        color: white;
+        font-size: 16px; /* 원하는 텍스트 크기로 조절 */
+      }
+    </style>
   </head>
-  <body>
-    <h1>Video Streaming</h1>
-    <img src="{{ url_for('video') }}" width="640" height="480" />
+  <body style="margin: 0px; height: 100%; background-color: rgb(14, 14, 14); display: flex; justify-content: center; align-items: center;">
+    <!-- 이미지, 원 및 텍스트 -->
+    <div class="image-container">
+      <img style="display: block; -webkit-user-select: none;" src="http://192.168.73.158:8081/?action=stream">
+      <div class="circle"></div>
+      <div class="text" id="text">유도선에 맞게 얼굴을 위치시켜 주세요.</div>
+    </div>
+   <script>
+      // 이미지 업데이트를 위한 JavaScript 코드
+        function changeText(newText) {
+        var textElement = document.getElementById('text');
+        textElement.innerText = newText;
+      }
+       setInterval(async function() {
+       try {
+            const response = await fetch('{{ url_for('video') }}');
+            const data = await response.json();
+            changeText(data.newText);
+        } catch (error) {
+            console.error(error);
+        }
+       }, 5000);
+
+    </script>
   </body>
 </html>
