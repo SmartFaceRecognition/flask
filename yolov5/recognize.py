@@ -42,9 +42,9 @@ ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
 from ultralytics.utils.plotting import Annotator, colors, save_one_box
 
-from utils.dataloaders import LoadStreams
-from utils.general import (Profile, check_img_size, increment_path, non_max_suppression, scale_boxes)
-from utils.torch_utils import select_device, smart_inference_mode
+from utils.dataloaders import IMG_FORMATS, VID_FORMATS, LoadImages, LoadScreenshots, LoadStreams
+from utils.general import (Profile, increment_path, non_max_suppression, scale_boxes)
+from utils.torch_utils import smart_inference_mode
 from app import detector, predictor, input_feature_map_extractor
 from landmark import face_alignment
 from face_recognition import face_recognition
@@ -52,9 +52,9 @@ from face_recognition import face_recognition
 
 @smart_inference_mode()
 def run(
-        source='http://192.168.73.158:8081/?action=stream',  # file/dir/URL/glob/screen/0(webcam)
+        source=ROOT / 'data/images',  # file/dir/URL/glob/screen/0(webcam)
         imgsz=(640, 640),  # inference size (height, width)
-        conf_thres=0.95,  # confidence threshold
+        conf_thres=0.80,  # confidence threshold
         iou_thres=0.45,  # NMS IOU threshold
         max_det=1000,  # maximum detections per image
         save_crop=True,  # save cropped prediction boxes
@@ -74,14 +74,12 @@ def run(
         pt=None,
         names=None
 ):
-    webcam = True
-
     # Directories
     save_dir = increment_path(Path(project) / name, exist_ok=exist_ok)  # increment run
 
+    bs = 1
     # Dataloader
-    dataset = LoadStreams(source, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
-    bs = len(dataset)
+    dataset = LoadImages(source, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
 
     # Run inference
     model.warmup(imgsz=(1 if pt or model.triton else bs, 3, *imgsz))  # warmup
@@ -106,12 +104,7 @@ def run(
         # Process predictions
         for i, det in enumerate(pred):  # per image
             seen += 1
-            if webcam:  # batch_size >= 1
-                p, im0, frame = path[i], im0s[i].copy(), dataset.count
-                s += f'{i}: '
-            else:
-                p, im0, frame = path, im0s.copy(), getattr(dataset, 'frame', 0)
-
+            p, im0, frame = path, im0s.copy(), getattr(dataset, 'frame', 0)
             p = Path(p)
             s += '%gx%g ' % im.shape[2:]  # print string
             imc = im0.copy() if save_crop else im0  # for save_crop

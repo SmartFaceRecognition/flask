@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html style="height: 100%;">
   <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <meta name="viewport" content="width=device-width, minimum-scale=0.1">
     <style>
       /* 이미지 컨테이너 스타일 */
@@ -43,20 +44,12 @@
       <div class="text" id="text">유도선에 맞게 얼굴을 위치시켜 주세요.</div>
     </div>
    <script>
-      // 이미지 업데이트를 위한 JavaScript 코드
-        function changeText(newText) {
-        var textElement = document.getElementById('text');
-        textElement.innerText = newText;
-      }
-       setInterval(async function() {
-       try {
-            const response = await fetch('{{ url_for('video') }}');
-            const data = await response.json();
-            changeText(data.newText);
-        } catch (error) {
-            console.error(error);
-        }
-       }, 5000);
+     const socket = io.connect('http://' + "127.0.0.1" + ':' + "5000");
+
+        // 서버로부터 업데이트된 텍스트를 수신
+        socket.on('newText', (newText) => {
+            document.getElementById('text').innerText = newText;
+        });
 
     </script>
   </body>
